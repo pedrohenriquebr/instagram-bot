@@ -14,6 +14,8 @@ load_dotenv(override=True)
 USERNAME = os.getenv('USERNAME')
 PASSWORD = os.getenv('PASSWORD')
 LINK = os.getenv('LINK')
+GECKODRIVER = os.getenv('GECKODRIVER', False)
+FIREFOX_PATH = os.getenv('FIREFOX_PATH', False)
 
 class Bot:
     def __init__(self, username, password):
@@ -24,7 +26,12 @@ class Bot:
         print('starting')
         self.options = Options()
         self.options.headless = True
-        self.driver  = webdriver.Firefox(options=self.options)
+        if GECKODRIVER and FIREFOX_PATH:
+            self.driver  = webdriver.Firefox(options=self.options, 
+            firefox_binary=FIREFOX_PATH, executable_path=GECKODRIVER)
+        else:
+            self.driver  = webdriver.Firefox(options=self.options)
+
         self.driver.implicitly_wait(5)
         self.driver.get('http://instagram.com')
         print('Login...')
