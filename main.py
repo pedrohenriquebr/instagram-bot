@@ -33,7 +33,7 @@ class Bot:
             self.driver  = webdriver.Firefox(options=self.options)
 
         self.driver.implicitly_wait(5)
-        
+
         self.driver.get('http://instagram.com')
         print('Login...')
         self.login()
@@ -54,7 +54,7 @@ class Bot:
         sleep(8)
 
         for a,b in zip(self.followers_list[::2], self.followers_list[1::2]):
-            print(f'Commeting...')
+            print(f'Commenting...')
             comment_input = self.driver.find_element_by_css_selector("textarea")
             comment_input.click()
             sleep(2)
