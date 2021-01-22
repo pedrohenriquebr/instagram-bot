@@ -33,6 +33,7 @@ class Bot:
             self.driver  = webdriver.Firefox(options=self.options)
 
         self.driver.implicitly_wait(5)
+        
         self.driver.get('http://instagram.com')
         print('Login...')
         self.login()
