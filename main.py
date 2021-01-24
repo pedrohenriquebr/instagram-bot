@@ -36,8 +36,6 @@ class Bot:
         self.min_random_delay = min_random_delay
         self.max_random_delay = max_random_delay
 
-    def start(self):
-        print('starting')
         self.options = Options()
         self.options.headless = bool(self.headless)
         if self.geckodriver and self.firefox_path:
@@ -46,7 +44,7 @@ class Bot:
         else:
             self.driver  = webdriver.Firefox(options=self.options)
 
-        self.driver.implicitly_wait(5)
+    def start(self):
         print('Login...')
         self.login()
         print('Loading followers...')
@@ -99,6 +97,7 @@ class Bot:
         return open('followers.txt','rt').readlines()
 
     def login(self) -> None:
+        self.driver.implicitly_wait(5)
         self.driver.get('http://instagram.com')
         self.driver.find_element_by_css_selector("input[name='username']").send_keys(self.username)
         self.driver.find_element_by_css_selector("input[name='password']").send_keys(self.password)
@@ -158,4 +157,4 @@ if __name__ == "__main__":
               geckodriver=settings['geckodriver'],firefox_path=settings['firefox_path'],
                 headless=settings['headless'],custom_comment=settings['custom_comment'],
                 min_random_delay=settings['min_random_delay'],max_random_delay=settings['max_random_delay'])
-    bot.start()
+    # bot.start()
