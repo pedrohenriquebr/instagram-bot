@@ -18,6 +18,9 @@ GECKODRIVER = os.getenv('GECKODRIVER', False)
 FIREFOX_PATH = os.getenv('FIREFOX_PATH', False)
 HEADLESS = os.getenv('HEADLESS',False)
 CUSTOM_COMMENT= os.getenv('CUSTOM_COMMENT', False)
+MIN_RANDOM_DELAY= int(os.getenv('MIN_RANDOM_DELAY', 60))
+MAX_RANDOM_DELAY= int(os.getenv('MAX_RANDOM_DELAY', 120))
+
 class Bot:
     def __init__(self, username, password):
         self.username = username
@@ -67,7 +70,7 @@ class Bot:
             last_state += 2
             last_state_file.write(f'{last_state}\n')
             last_state_file.close()
-            sleep(int(random() * (120 - 60)) + 60)
+            sleep(int(random() * (MAX_RANDOM_DELAY - MIN_RANDOM_DELAY)) + MIN_RANDOM_DELAY)
         sleep(20)
         print('bye!')
         self.driver.close()
