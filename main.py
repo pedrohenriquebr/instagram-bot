@@ -48,8 +48,8 @@ class Bot:
         print('Login...')
         self.login()
         print('Loading followers...')
-        self.followers_list  = self.load_followers()
-        print(len(self.followers_list))
+        self.load_accounts()
+        print(len(self.accounts_list))
         
         sleep(6)
         self.open_post(self.post_link)
@@ -59,8 +59,8 @@ class Bot:
         if os.path.exists(state_path):
             last_state = int(open(state_path,'r').readlines()[-1].strip())
         print('last index: ', last_state)
-        self.followers_list = self.followers_list[last_state+1:]
-        for a,b in zip(self.followers_list[::2], self.followers_list[1::2]):
+        self.accounts_list = self.accounts_list[last_state+1:]
+        for a,b in zip(self.accounts_list[::2], self.accounts_list[1::2]):
             print(f'Commenting...')
             comment_input = self.driver.find_element_by_css_selector("textarea")
             comment_input.click()
@@ -85,16 +85,37 @@ class Bot:
         print('Opening post...')
         self.driver.get(f'https://www.instagram.com/p/{post_link}/')
 
-    def load_followers(self) -> List[str]:
-        if  not os.path.exists('followers.txt'):
-            with open('followers.txt', 'wt') as file:
-                try:
-                    for count, follower in enumerate(self.scrape_followers(account=self.username), 1):
-                        print("\t{:>3}: {}".format(count, follower))
-                        file.write(follower+'\n')
-                except:
-                    pass
-        return open('followers.txt','rt').readlines()
+    def _load_accounts_file(self) -> List[str]:
+        return list(map(lambda x: x.strip(), open('accounts.txt','r').readlines()))
+
+    def _load_followers(self, account) -> List[str]:
+        tmp_list = []
+        try:
+            for count, follower in enumerate(self._scrape_followers(account=account), 1):
+                    tmp_list.append(follower)
+        except:
+            pass
+        return tmp_list
+
+    def upsert_accounts(self, account):
+        
+        if  not os.path.exists('accounts.txt'):
+            raise Exception('accounts.txt not found!')
+        
+        self.accounts_list = self.accounts_list + self._load_followers(account)
+        self.accounts_list = list(set(self.accounts_list))
+        with open('accounts.txt','a') as f:
+            tmp = list(map(lambda x: x+'\n', self.accounts_list))
+            f.writelines(tmp)
+
+    def load_accounts(self) -> None:
+        if  not os.path.exists('accounts.txt'):
+            self.accounts_list = self._load_followers(self.username)
+            with open('accounts.txt','w') as f:
+                tmp = list(map(lambda x: x+'\n', self.accounts_list))
+                f.writelines(tmp)
+        else:
+            self.accounts_list = self._load_accounts_file()
 
     def login(self) -> None:
         self.driver.implicitly_wait(5)
@@ -105,7 +126,7 @@ class Bot:
         sleep(6)
 
     # I found here https://www.codegrepper.com/code-examples/whatever/scraping+instagram+followers+list+python
-    def scrape_followers(self, account) -> Iterator[str]:
+    def _scrape_followers(self, account) -> Iterator[str]:
         # Load account page
         self.driver.get("https://www.instagram.com/{0}/".format(account))
 
@@ -157,4 +178,4 @@ if __name__ == "__main__":
               geckodriver=settings['geckodriver'],firefox_path=settings['firefox_path'],
                 headless=settings['headless'],custom_comment=settings['custom_comment'],
                 min_random_delay=settings['min_random_delay'],max_random_delay=settings['max_random_delay'])
-    # bot.start()
+    bot.start()
