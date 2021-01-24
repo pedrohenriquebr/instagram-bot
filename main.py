@@ -17,6 +17,7 @@ LINK = os.getenv('LINK')
 GECKODRIVER = os.getenv('GECKODRIVER', False)
 FIREFOX_PATH = os.getenv('FIREFOX_PATH', False)
 HEADLESS = os.getenv('HEADLESS',False)
+CUSTOM_COMMENT= os.getenv('CUSTOM_COMMENT', False)
 class Bot:
     def __init__(self, username, password):
         self.username = username
@@ -56,7 +57,10 @@ class Bot:
             comment_input.click()
             sleep(2)
             comment_input = self.driver.find_element_by_css_selector("textarea")
-            comment_input.send_keys(f'VOU GANHAR @{a} @{b}')
+            if CUSTOM_COMMENT:
+                comment_input.send_keys(f'{CUSTOM_COMMENT} @{a} @{b}')
+            else:
+                comment_input.send_keys(f'@{a} @{b}')
             sleep(6)
             self.driver.find_element_by_css_selector("button[type=submit]").click()
             last_state_file = open(state_path,'w')
