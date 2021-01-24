@@ -16,7 +16,7 @@ PASSWORD = os.getenv('PASSWORD')
 LINK = os.getenv('LINK')
 GECKODRIVER = os.getenv('GECKODRIVER', False)
 FIREFOX_PATH = os.getenv('FIREFOX_PATH', False)
-
+HEADLESS = os.getenv('HEADLESS',False)
 class Bot:
     def __init__(self, username, password):
         self.username = username
@@ -25,7 +25,7 @@ class Bot:
     def start(self):
         print('starting')
         self.options = Options()
-        self.options.headless = True
+        self.options.headless = bool(HEADLESS)
         if GECKODRIVER and FIREFOX_PATH:
             self.driver  = webdriver.Firefox(options=self.options, 
             firefox_binary=FIREFOX_PATH, executable_path=GECKODRIVER)
@@ -42,27 +42,36 @@ class Bot:
         print(len(self.followers_list))
         
         sleep(6)
-        self.goto(LINK)
-        
-        sleep(20)
-        print('bye!')
-        self.driver.close()
-
-    def goto(self, post_link: str) -> None:
-        print('Opening post...')
-        self.driver.get(f'https://www.instagram.com/p/{post_link}/')
+        self.open_post(LINK)
         sleep(8)
-
+        last_state = 0
+        state_path = f'{LINK}_state.txt'
+        if os.path.exists(state_path):
+            last_state = int(open(state_path,'r').readlines()[-1].strip())
+        print('last index: ', last_state)
+        self.followers_list = self.followers_list[last_state+1:]
         for a,b in zip(self.followers_list[::2], self.followers_list[1::2]):
             print(f'Commenting...')
             comment_input = self.driver.find_element_by_css_selector("textarea")
             comment_input.click()
             sleep(2)
             comment_input = self.driver.find_element_by_css_selector("textarea")
-            comment_input.send_keys(f'@{a} @{b}')
-            sleep(1)
+            comment_input.send_keys(f'VOU GANHAR @{a} @{b}')
+            sleep(6)
             self.driver.find_element_by_css_selector("button[type=submit]").click()
+            last_state_file = open(state_path,'w')
+            last_state += 2
+            last_state_file.write(f'{last_state}\n')
+            last_state_file.close()
             sleep(int(random() * (120 - 60)) + 60)
+        sleep(20)
+        print('bye!')
+        self.driver.close()
+
+    def open_post(self, post_link: str) -> None:
+        print('Opening post...')
+        self.driver.get(f'https://www.instagram.com/p/{post_link}/')
+
 
     def load_followers(self) -> List[str]:
         if  not os.path.exists('followers.txt'):
