@@ -47,8 +47,6 @@ class Bot:
             self.driver  = webdriver.Firefox(options=self.options)
 
         self.driver.implicitly_wait(5)
-
-        self.driver.get('http://instagram.com')
         print('Login...')
         self.login()
         print('Loading followers...')
@@ -101,6 +99,7 @@ class Bot:
         return open('followers.txt','rt').readlines()
 
     def login(self) -> None:
+        self.driver.get('http://instagram.com')
         self.driver.find_element_by_css_selector("input[name='username']").send_keys(self.username)
         self.driver.find_element_by_css_selector("input[name='password']").send_keys(self.password)
         self.driver.find_element_by_xpath("//button[@type='submit']").click()
