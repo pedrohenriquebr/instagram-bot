@@ -144,6 +144,7 @@ dmypy.json
 .prof
 
 followers.txt
+*_state.txt
 geckodriver*
 
 # End of https://www.toptal.com/developers/gitignore/api/python
