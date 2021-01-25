@@ -183,4 +183,4 @@ if __name__ == "__main__":
               geckodriver=settings['geckodriver'],firefox_path=settings['firefox_path'],
                 headless=settings['headless'],custom_comment=settings['custom_comment'],
                 min_random_delay=settings['min_random_delay'],max_random_delay=settings['max_random_delay'])
-    # bot.start()
+    bot.start()
