@@ -13,7 +13,7 @@ class Bot:
     def __init__(self, username, password, post_link,
                 geckodriver=False,firefox_path=False,
                 headless=False,custom_comment=False,
-                min_random_delay=60,max_random_delay=120):
+                min_random_delay=60,max_random_delay=120, limit=20):
         """
         Starts a new bot instance.
 
@@ -24,7 +24,8 @@ class Bot:
         :param headless: boolean for headless param for Firefox Options.
         :param custom_element: a text to append to comment alongside mentions.
         :param min_random_delay: minium integer seconds for random delay between each comments.
-        :param max_random_delay: maximum integer seconds for random delay between each comments.  
+        :param max_random_delay: maximum integer seconds for random delay between each comments.
+        :param limit: comments limit number.
         """
         self.username = username
         self.password = password
@@ -35,6 +36,7 @@ class Bot:
         self.custom_comment = custom_comment
         self.min_random_delay = min_random_delay
         self.max_random_delay = max_random_delay
+        self.limit = limit
 
         self.options = Options()
         self.options.headless = bool(self.headless)
@@ -61,6 +63,7 @@ class Bot:
             last_state = int(open(state_path,'r').readlines()[-1].strip())
         print('last index: ', last_state)
         self.accounts_list = self.accounts_list[last_state+1:]
+        counter = 0
         for a,b in zip(self.accounts_list[::2], self.accounts_list[1::2]):
             print(f'Commenting...')
             comment_input = self.driver.find_element_by_css_selector("textarea")
@@ -77,8 +80,12 @@ class Bot:
             last_state += 2
             last_state_file.write(f'{last_state}\n')
             last_state_file.close()
+            counter += 1
+            if counter >= self.limit:
+                print('Limit number of comments reached!')
+                break
             sleep(int(random() * (self.max_random_delay - self.min_random_delay)) + self.min_random_delay)
-        sleep(20)
+        sleep(4)
         print('bye!')
         self.driver.close()
 
@@ -182,5 +189,6 @@ if __name__ == "__main__":
     bot = Bot(username=settings['username'],password=settings['password'], post_link=settings['post_link'],
               geckodriver=settings['geckodriver'],firefox_path=settings['firefox_path'],
                 headless=settings['headless'],custom_comment=settings['custom_comment'],
-                min_random_delay=settings['min_random_delay'],max_random_delay=settings['max_random_delay'])
+                min_random_delay=settings['min_random_delay'],max_random_delay=settings['max_random_delay'],
+                limit=settings['limit'])
     bot.start()
