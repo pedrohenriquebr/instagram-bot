@@ -45,6 +45,7 @@ class Bot:
             self.driver  = webdriver.Firefox(options=self.options)
 
     def start(self):
+        """Starts the bot"""
         print('Login...')
         self.login()
         print('Loading followers...')
@@ -82,13 +83,17 @@ class Bot:
         self.driver.close()
 
     def open_post(self, post_link: str) -> None:
+        """Open post link"""
         print('Opening post...')
         self.driver.get(f'https://www.instagram.com/p/{post_link}/')
 
     def _load_accounts_file(self) -> List[str]:
+        """Load all accounts from file."""
         return list(map(lambda x: x.strip(), open('accounts.txt','r').readlines()))
 
     def _load_followers(self, account) -> List[str]:
+        """Scrap and convert into list all followers from account name."""
+
         tmp_list = []
         try:
             for count, follower in enumerate(self._scrape_followers(account=account), 1):
@@ -98,7 +103,11 @@ class Bot:
         return tmp_list
 
     def upsert_accounts(self, account):
-        
+        """
+        Load accounts with followers from passed account
+        :param account: account name.
+        """
+
         if  not os.path.exists('accounts.txt'):
             raise Exception('accounts.txt not found!')
         
@@ -109,6 +118,7 @@ class Bot:
             f.writelines(tmp)
 
     def load_accounts(self) -> None:
+        """Load accounts with followers list from current logged account""" 
         if  not os.path.exists('accounts.txt'):
             self.accounts_list = self._load_followers(self.username)
             with open('accounts.txt','w') as f:
@@ -118,6 +128,7 @@ class Bot:
             self.accounts_list = self._load_accounts_file()
 
     def login(self) -> None:
+        """Login the user"""
         self.driver.implicitly_wait(5)
         self.driver.get('http://instagram.com')
         self.driver.find_element_by_css_selector("input[name='username']").send_keys(self.username)
