@@ -104,12 +104,12 @@ class Bot:
 
     def upsert_accounts(self, account):
         """
-        Load accounts with followers from passed account
+        Load accounts with followers from passed account and 
+        create/update the accounts.txt file.
         :param account: account name.
         """
-        
-        self.accounts_list = self.accounts_list + self._load_followers(account)
-        self.accounts_list = list(set(self.accounts_list))
+
+        self.accounts_list = list(set(self.accounts_list + self._load_followers(account)))
         with open('accounts.txt','a') as f:
             tmp = list(map(lambda x: x+'\n', self.accounts_list))
             f.writelines(tmp)
@@ -117,10 +117,7 @@ class Bot:
     def load_accounts(self) -> None:
         """Load accounts with followers list from current logged account""" 
         if  not os.path.exists('accounts.txt'):
-            self.accounts_list = self._load_followers(self.username)
-            with open('accounts.txt','w') as f:
-                tmp = list(map(lambda x: x+'\n', self.accounts_list))
-                f.writelines(tmp)
+            self.upsert_accounts(self.username)
         else:
             self.accounts_list = self._load_accounts_file()
 
@@ -186,4 +183,4 @@ if __name__ == "__main__":
               geckodriver=settings['geckodriver'],firefox_path=settings['firefox_path'],
                 headless=settings['headless'],custom_comment=settings['custom_comment'],
                 min_random_delay=settings['min_random_delay'],max_random_delay=settings['max_random_delay'])
-    bot.start()
+    # bot.start()
