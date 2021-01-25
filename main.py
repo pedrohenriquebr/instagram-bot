@@ -37,6 +37,8 @@ class Bot:
         self.min_random_delay = min_random_delay
         self.max_random_delay = max_random_delay
         self.limit = limit
+        self.cache = {}
+        self.accounts_list = []
 
         self.options = Options()
         self.options.headless = bool(self.headless)
@@ -115,12 +117,22 @@ class Bot:
         create/update the accounts.txt file.
         :param account: account name.
         """
-
+        if account in self.cache.keys():
+            return
+         
+        self.cache[account] = True
         self.accounts_list = list(set(self.accounts_list + self._load_followers(account)))
         with open('accounts.txt','a') as f:
             tmp = list(map(lambda x: x+'\n', self.accounts_list))
             f.writelines(tmp)
 
+    def _deep_load_accounts(self, account) -> None:
+        """Deep load of followers of followers"""
+        self.upsert_accounts(self.username)
+
+        for account in self.accounts_list:
+            self.upsert_accounts(account)
+        
     def load_accounts(self) -> None:
         """Load accounts with followers list from current logged account""" 
         if  not os.path.exists('accounts.txt'):
