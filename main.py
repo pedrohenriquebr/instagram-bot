@@ -107,9 +107,6 @@ class Bot:
         Load accounts with followers from passed account
         :param account: account name.
         """
-
-        if  not os.path.exists('accounts.txt'):
-            raise Exception('accounts.txt not found!')
         
         self.accounts_list = self.accounts_list + self._load_followers(account)
         self.accounts_list = list(set(self.accounts_list))
