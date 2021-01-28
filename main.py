@@ -98,15 +98,14 @@ class Bot:
 
     def _load_accounts_file(self) -> List[str]:
         """Load all accounts from file."""
-        return list(map(lambda x: x.strip(), open('accounts.txt','r').readlines()))
+        return [x.strip() for x in open('accounts.txt','r').readlines()]
 
     def _load_followers(self, account) -> List[str]:
         """Scrap and convert into list all followers from account name."""
 
         tmp_list = []
         try:
-            for count, follower in enumerate(self._scrape_followers(account=account), 1):
-                    tmp_list.append(follower)
+            tmp_list = list(self._scrape_followers(account))
         except:
             pass
         return tmp_list
@@ -123,7 +122,7 @@ class Bot:
         self.cache[account] = True
         self.accounts_list = list(set(self.accounts_list + self._load_followers(account)))
         with open('accounts.txt','a') as f:
-            tmp = list(map(lambda x: x+'\n', self.accounts_list))
+            tmp = [account + '\n' for account in self.accounts_list]
             f.writelines(tmp)
 
     def _deep_load_accounts(self, account) -> None:
